@@ -14,23 +14,23 @@ import com.skilldistillery.pokemon.entities.Pokemon;
 public class PokemonController {
 
 	@Autowired
-	private PokemonDAO pDao;
+	private PokemonDAO pokemonDao;
 
 	@RequestMapping(path = { "/", "home.do" })
 	public String goHome(Model model) {
-		model.addAttribute("pokemons", pDao.findAll());
+		model.addAttribute("pokemons", pokemonDao.findAll());
 		return "home";
 	}
 
-	@RequestMapping(path = "createNewPokemon.do", method = RequestMethod.GET)
+	@RequestMapping(path = "createNewPokemon.do", method = RequestMethod.POST)
 	public ModelAndView createNewPokemon(Pokemon pokemon) {
 		ModelAndView mv = new ModelAndView();
-		Pokemon p = pDao.create(pokemon);
+		Pokemon p = pokemonDao.create(pokemon);
 
 		if (pokemon == null) {
 
 		} else {
-			mv.addObject("pokemon", p);
+			mv.addObject("Pokemon", p);
 			mv.setViewName("result");
 			return mv;
 		}
@@ -40,7 +40,7 @@ public class PokemonController {
 	@RequestMapping(path = "getSinglePokemon.do", method = RequestMethod.GET)
 	public ModelAndView findById(int pokemonId) {
 		ModelAndView mv = new ModelAndView();
-		Pokemon p = pDao.findById(pokemonId);
+		Pokemon p = pokemonDao.findById(pokemonId);
 		if (p == null) {
 
 		} else {
@@ -51,10 +51,16 @@ public class PokemonController {
 		return mv;
 	}
 
-	@RequestMapping(path = "update.do", method = RequestMethod.POST)
-	public ModelAndView updatePage(int pokemonId, Pokemon pokemon) {
+	@RequestMapping(path = "goToCreatePokemon.do", method = RequestMethod.GET)
+	public ModelAndView goToCreateNewPokemon() {
 		ModelAndView mv = new ModelAndView();
-		Pokemon p = pDao.findById(pokemonId);
+		mv.setViewName("createPokemon");
+		return mv;
+	}
+	@RequestMapping(path = "goToUpdatePokemon.do", method = RequestMethod.POST)
+	public ModelAndView goToUpdatePokemon(int id) {
+		ModelAndView mv = new ModelAndView();
+		Pokemon p = pokemonDao.findById(id);
 		mv.addObject("pokemon", p);
 		mv.setViewName("updatePokemon");
 		return mv;
@@ -63,8 +69,8 @@ public class PokemonController {
 	@RequestMapping(path = "updatePokemon.do", method = RequestMethod.POST)
 	public ModelAndView update(Pokemon pokemon) {
 		ModelAndView mv = new ModelAndView();
-		Pokemon pokemonEdited = pDao.update(0, pokemon);
-		Pokemon reGetPokemon = pDao.findById(pokemonEdited.getId());
+		Pokemon pokemonEdited = pokemonDao.update(pokemon.getId(), pokemon);
+		Pokemon reGetPokemon = pokemonDao.findById(pokemonEdited.getId());
 		if (!pokemonEdited.equals(null)) {
 			mv.addObject("Pokemon", reGetPokemon);
 			mv.setViewName("result");
@@ -72,5 +78,22 @@ public class PokemonController {
 		} else {
 			return mv;
 		}
-	}    
+	}
+
+	@RequestMapping(path = "delete.do", method = RequestMethod.POST)
+	public ModelAndView deletePokemon(int id) {
+		ModelAndView mv = new ModelAndView();
+		boolean isPokemonDeleted = pokemonDao.deleteById(id);
+		if (isPokemonDeleted == true) {
+			System.out.println(isPokemonDeleted);
+			mv.addObject("isDeleted", true);
+			mv.setViewName("result");
+			return mv;
+		} else {
+			System.out.println(isPokemonDeleted);
+			mv.addObject("notDeleted", true);
+			mv.setViewName("result");
+			return mv;
+		}
+	}
 }

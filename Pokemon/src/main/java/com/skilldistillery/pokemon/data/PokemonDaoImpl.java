@@ -42,37 +42,34 @@ public class PokemonDaoImpl implements PokemonDAO {
 	
 	@Override
 	public Pokemon create(Pokemon pokemon) {
-//		String jpql = "INSERT p INTO Pokemon p";
-//		Pokemon createdPokemon; 
-////		= em.createQuery(pokemon); 
-		return null;
-//				createdPokemon;
+		em.persist(pokemon);
+		em.flush();
+		return pokemon;
 	}
 	
 	@Override
 	public Pokemon update(int pokemonId, Pokemon pokemon) {
-		String jpql = "SELECT p FROM Pokemon WHERE id = ?";
+		Pokemon managedPokemon = em.find(Pokemon.class, pokemon.getId());
 		
-		Pokemon managedPokemon = em.find(pokemon.getClass(), pokemonId);
-		
-		managedPokemon.setName(pokemon.getName());
+		if(managedPokemon != null) {
+			managedPokemon.setId(pokemon.getId());
+			managedPokemon.setName(pokemon.getName());
+			managedPokemon.setDescription(pokemon.getDescription());
+		}
 		
 		return managedPokemon;
 	}
 
 	@Override
-	public boolean deleteById(int pokemonId) {
-		boolean success = true;
-		String jpql = "SELECT p FROM Pokemon WHERE id = ?";
-		Pokemon deletedPokemon = em.find(Pokemon.class, pokemonId);
+	public boolean deleteById(int id) {
+		Pokemon managedPokemon = em.find(Pokemon.class, id);
 		
-		if(em.contains(deletedPokemon)) {
-			deletedPokemon.setId(pokemonId);
-			em.remove(deletedPokemon);
-			return success;
-		} else {
-		return false;
-	   }
+		if(managedPokemon != null) {
+			em.remove(managedPokemon);			
+		}
+		
+	    boolean wasDeleted = !em.contains(managedPokemon);
+	    return wasDeleted;
 	}	
 }	
 	

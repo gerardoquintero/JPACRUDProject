@@ -9,5 +9,5 @@ public interface PokemonDAO {
 	List<Pokemon> findAll();
 	Pokemon create(Pokemon pokemon);
 	Pokemon update(int pokemonId, Pokemon pokemon);
-	boolean deleteById(int pokemonId);
+	boolean deleteById(int id);
 }
